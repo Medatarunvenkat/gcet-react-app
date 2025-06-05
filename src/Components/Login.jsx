@@ -25,7 +25,7 @@ export default function Login() {
     try {
       console.log("Attempting login with:", { email: loginData.email }); 
       
-      const response = await fetch(`${API}/login`, {
+      const response = await fetch(`${API}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,13 +36,13 @@ export default function Login() {
       const data = await response.json();
       console.log("Login response:", data);
 
-      if (response.ok && data.user && data.token) {
-        setMsg("Welcome " + data.user.name);
-        setUser(data.user);
-        Navigate("/");
-      } else {
-        setMsg(data.error || "Login failed");
-      }
+      if (response.ok && data && data._id) {
+  setMsg("Welcome " + data.name);
+  setUser(data);
+  Navigate("/");
+} else {
+  setMsg("Login failed");
+}
     } catch (error) {
       console.error("Login error:", error);
       setMsg("Network error. Please check if the server is running.");
@@ -52,7 +52,7 @@ export default function Login() {
   };
 
   const goToRegister = () => {
-    Navigate("/register");
+    Navigate("/users/register");
   };
 
   return (

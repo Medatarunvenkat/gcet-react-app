@@ -1,11 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Cart() {
+  const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    // Fetch cart items from localStorage when component mounts
+    const loadCartFromStorage = () => {
+      try {
+        const storedCart = localStorage.getItem('cart');
+        if (storedCart) {
+          setCartItems(JSON.parse(storedCart));
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+      }
+    };
+
+    loadCartFromStorage();
+  }, []);
+
+  const updateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+
+    const updatedCart = cartItems.map(item =>
+      item._id === productId
+        ? { ...item, quantity: newQuantity }
+        : item
+    );
+
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  };
+
+  const removeFromCart = (productId) => {
+    const updatedCart = cartItems.filter(item => item._id !== productId);
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem('cart');
+  };
+
+  const getCartTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  if (cartItems.length === 0) {
+    return (
+      <main>
+        <div className="cart-container fade-in">
+          <h2>My Cart</h2>
+          <p>Your cart is currently empty</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main>
       <div className="cart-container fade-in">
         <h2>My Cart</h2>
-        <p>Your cart is currently empty</p>
+        
+        <div className="cart-items">
+          {cartItems.map(item => (
+            <div key={item._id} className="cart-item">
+              <div className="item-details">
+                <h4>{item.name}</h4>
+                <p className="item-price">₹{item.price}</p>
+              </div>
+              
+              <div className="quantity-controls">
+                <button 
+                  onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                  className="quantity-btn"
+                >
+                  -
+                </button>
+                <span className="quantity">{item.quantity}</span>
+                <button 
+                  onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                  className="quantity-btn"
+                >
+                  +
+                </button>
+              </div>
+              
+              <div className="item-total">
+                <p>₹{item.price * item.quantity}</p>
+              </div>
+              
+              <button 
+                onClick={() => removeFromCart(item._id)}
+                className="remove-btn"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        
+        <div className="cart-summary">
+          <div className="total-section">
+            <h3>Total: ₹{getCartTotal()}</h3>
+          </div>
+          
+          <div className="cart-actions">
+            <button onClick={clearCart} className="clear-cart-btn">
+              Clear Cart
+            </button>
+          </div>
+        </div>
       </div>
     </main>
   );
