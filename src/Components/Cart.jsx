@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../App';
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
-  const [user, setUser] = useState(null);
+  const { user } = useContext(AppContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
-
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
       setCartItems(JSON.parse(storedCart));
@@ -101,16 +99,15 @@ export default function Cart() {
               Clear Cart
             </button>
 
-            {user ? (
-  <button onClick={proceedToPayment} className="btn-common proceed-payment-btn">
-    Proceed to Payment
-  </button>
-) : (
-  <button onClick={() => navigate('/login')} className="btn-common proceed-payment-btn">
-    Login to Checkout
-  </button>
-)}
-
+            {user && user.email ? (
+              <button onClick={proceedToPayment} className="btn-common proceed-payment-btn">
+                Proceed to Payment
+              </button>
+            ) : (
+              <button onClick={() => navigate('/login')} className="btn-common proceed-payment-btn">
+                Login to Checkout
+              </button>
+            )}
           </div>
         </div>
       </div>
