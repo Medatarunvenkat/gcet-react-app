@@ -1,24 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadCartFromStorage = () => {
-      try {
-        const storedCart = localStorage.getItem('cart');
-        if (storedCart) {
-          setCartItems(JSON.parse(storedCart));
-        }
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
-      }
-    };
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    setUser(storedUser);
 
-    loadCartFromStorage();
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
   }, []);
 
   const updateQuantity = (productId, newQuantity) => {
@@ -51,44 +46,8 @@ export default function Cart() {
   };
 
   const proceedToPayment = () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user._id) {
-      navigate('/login');
-      return;
-    }
-
     const total = getCartTotal();
     navigate('/payment', { state: { total, email: user.email } });
-  };
-
-  // Optional: Function to place order directly (not used here)
-  const placeOrder = async () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user._id) {
-      alert('User not logged in');
-      return;
-    }
-
-    try {
-      const response = await fetch('/orders/new', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ items: cartItems, userId: user._id }),
-      });
-
-      if (response.ok) {
-        clearCart();
-        alert('Order placed successfully!');
-        navigate('/orders');
-      } else {
-        alert('Failed to place order');
-      }
-    } catch (error) {
-      console.error('Error placing order:', error);
-      alert('Error placing order');
-    }
   };
 
   if (cartItems.length === 0) {
@@ -141,9 +100,17 @@ export default function Cart() {
             <button onClick={clearCart} className="btn-common clear-cart-btn">
               Clear Cart
             </button>
-            <button onClick={proceedToPayment} className="btn-common proceed-payment-btn">
-              Proceed to Payment
-            </button>
+
+            {user ? (
+  <button onClick={proceedToPayment} className="btn-common proceed-payment-btn">
+    Proceed to Payment
+  </button>
+) : (
+  <button onClick={() => navigate('/login')} className="btn-common proceed-payment-btn">
+    Login to Checkout
+  </button>
+)}
+
           </div>
         </div>
       </div>
