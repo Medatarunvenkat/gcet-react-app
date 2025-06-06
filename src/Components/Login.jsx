@@ -96,7 +96,6 @@
 //     </main>
 //   );
 // }
-
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../App";
@@ -141,7 +140,7 @@ export default function Login() {
           // If backend returns user data with _id or id
           setMsg("Welcome " + (data.name || "User"));
           setUser(data);
-          
+          localStorage.setItem('user', JSON.stringify(data));
           // Redirect to homepage after short delay
           setTimeout(() => {
             Navigate("/"); // Redirect to homepage
