@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Cart from "./Components/Cart";
@@ -6,10 +6,10 @@ import Footer from "./Components/Footer";
 import Header from "./Components/Header";
 import Login from "./Components/Login";
 import Logout from "./Components/Logout";
+import Orders from "./Components/Orders";
+import Payment from './Components/Payment';
 import Products from "./Components/Products";
 import Register from "./Components/Register";
-import Payment from './Components/Payment';
-import Orders from "./Components/Orders";
 
 export const AppContext = createContext();
 
@@ -34,7 +34,6 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route index element={<Login />} />
           <Route path="/" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
